@@ -1,0 +1,311 @@
+import java.util.Scanner;
+import java.util.Random;
+public class MineSweeper
+{
+	static int[][] table;
+	static String[][] userTable;
+	public static void main(String[] args)
+	{
+		
+    // First I take the size of the board and how hard the game is going to be as inputs.
+    // 15% of the board are mines in easy,25% in medium and 40% in hard.
+    
+    Scanner scan = new Scanner(System.in);
+		Random rnd = new Random();
+		System.out.println("Enter the size of the board(a x a)");
+		String size = scan.nextLine();
+		System.out.println("Enter the difficulty(E,M,H)");
+		String difficulty = scan.next();
+		int carpi = size.indexOf("x");
+		int sutun = Integer.parseInt(size.substring(0,carpi - 1));
+		int satir = Integer.parseInt(size.substring(carpi + 2));
+		table = new int[sutun][satir];
+		int numberOfMines = 0;
+		int a = 0;
+		int b = 0;
+    
+   // Here I calculate the amount of mines the table will have and place them on the board using the Random class.
+   // In a 2 dimensional integer array I am using -1's as mines.
+		
+    if (difficulty.equals("E"))
+		{
+			numberOfMines = satir * sutun * 15 / 100;
+			for (int i = 0; i < numberOfMines;i++)
+			{
+				a = rnd.nextInt(sutun);
+				b = rnd.nextInt(satir);
+				if (table[a][b] == -1)
+				{
+					i--;
+					continue;
+				}
+				else 
+					table[a][b] = -1;
+			}
+
+		}
+		if (difficulty.equals("M"))
+		{
+			numberOfMines = satir * sutun * 25 / 100;
+			for (int i = 0; i < numberOfMines;i++)
+			{
+				a = rnd.nextInt(sutun);
+				b = rnd.nextInt(satir);
+				if (table[a][b] == -1)
+				{
+					i--;
+					continue;
+				}
+				else 
+					table[a][b] = -1;
+			}
+		}
+		if (difficulty.equals("H"))
+		{
+			numberOfMines = satir * sutun * 40 / 100;
+			for (int i = 0; i < numberOfMines;i++)
+			{
+				a = rnd.nextInt(sutun);
+				b = rnd.nextInt(satir);
+				if (table[a][b] == -1)
+				{
+					i--;
+					continue;
+				}
+				else 
+					table[a][b] = -1;
+			}
+		}
+   
+    // Now that the mines are successfully placed I fill the other places of the board according to the mines.
+    // To do this I check every 8 neighbour of a mine and if they exist I add +1 to them for each mine that they are neighbours to.
+    
+		int neighbourX = 0;
+		int neighbourY = 0;
+		int count = 0;
+		int[] arrayY = {0,1,0,-1,1,-1,1,-1};
+		int[] arrayX = {1,0,-1,0,1,-1,-1,1};
+		for (int i = 0;i < satir;i++)
+			for (int j = 0;j < sutun;j++)
+			{
+				if (table[i][j] == -1)
+				{}
+				else
+				{
+					count = 0;
+					
+					for (int k = 0; k < arrayX.length;k++)
+					{
+						neighbourX = j - arrayX[k];
+						neighbourY = i - arrayY[k];
+
+						if (neighbourX >= 0 && neighbourY >= 0 && neighbourY < table.length && neighbourX < table[0].length && table[neighbourY][neighbourX] == -1)
+							count++;
+					}
+					table[i][j] = count;
+				}
+
+			}
+      // Now I have a fully completed 2 dimensional integer array that I will not show the player.
+      // I create a userTable which is a 2 dimensional String array that is the same size as the first table, the player is going to be seeing this table.
+		
+		
+			
+		userTable = new String[sutun][satir];
+		for (int i = 0;i < satir;i++)
+			for (int j = 0;j < sutun;j++)
+				userTable[i][j] = "O";
+		
+
+  // Using a loop I am going to repeatedly ask for the players move and update the userTable according to that move.
+		
+    while(true)
+		{
+			// First I print out the userTable
+      
+      for (int i = 0;i < satir;i++)
+			{
+				for (int j = 0;j < sutun;j++)
+				{
+					if (j == sutun - 1)
+					System.out.print(userTable[i][j] + " \n");
+					else
+					System.out.print(userTable[i][j] + " ");
+				}
+			}
+			
+      
+      // I take the move as input in the a,b X format. X is the action which can be O for "open" F for "flag" or U for "unflag".
+      // a,b is for which cell the user wants to make a move a is for column b is for row.
+      
+      
+      System.out.print("Make a move(a,b X):");
+			String move = scan.next();
+			String action = scan.next();
+			int comma = move.indexOf(",");
+			int satir1 = 0;
+			int sutun1 = 0;
+			int satir2 = 0;
+			int sutun2 = 0;
+			
+			
+			
+			int x;
+			int y;
+			int end = 0;
+			if (action.equals("O"))
+			{	
+				satir1 =Integer.parseInt(move.substring(0,comma));
+				
+				sutun1 = Integer.parseInt(move.substring(comma + 1));
+				satir2 = satir1;
+				sutun2 = sutun1;
+				
+        // If the cell that the player is trying to open is already opened an error pops up.
+        
+        if (userTable[satir1 -1][sutun1 - 1] != "O" && userTable[satir1 -1][sutun1 - 1] != "F" )
+					System.out.println("Cell is already opened");
+				else
+				{
+
+					// If the cell is flagged it can't be opened.
+          
+          if (userTable[satir1 -1][sutun1 - 1].equals("F"))
+					{
+						System.out.println("Flagged cells cannot be opened");
+
+					}
+				
+					else 
+					{
+						
+            // If that cell has a mine in it the game is over player loses.
+            
+            if (table[satir1 - 1][sutun1 - 1] == -1)
+				
+						{
+							for (int i = 0;i < satir;i++)
+							{
+								for (int j = 0;j < sutun;j++)
+								{
+									if (table[i][j] == -1)
+										userTable[i][j] = "X";
+									if (j == sutun - 1)
+									System.out.print(userTable[i][j] + " \n");
+									else
+									System.out.print(userTable[i][j] + " ");
+								}
+							}
+							System.out.println("GAME OVER YOU LOST!");
+							break;
+						}
+						
+            // If the player opens a cell that has no neighbour mines the neighbours of the cell should be opened I did this using a recursive method called method.
+           
+           else if (table[satir1 - 1][sutun1 - 1] == 0)
+						{
+							method(satir1 - 1,sutun1 - 1);
+						}
+						
+            // If the cell is not a mine and has a neighbour mine the userTable gets updated using the first table.
+           
+           else
+						{
+							userTable[satir1 - 1][sutun1 - 1] = table[satir1 - 1][sutun1 - 1] + "";
+						
+						}
+					}
+				}
+			}
+			else
+			{
+				
+        // If the user wants to flag or unflag a cell the userTable gets updated easily accordingly as it is a string array.  
+        
+        satir1 =Integer.parseInt(move.substring(0,comma));
+				sutun1 = Integer.parseInt(move.substring(comma + 1));
+				
+				if (action.equals("F"))
+				{
+					if (userTable[satir1 - 1][sutun1 - 1] != "F" && userTable[satir1 - 1][sutun1 - 1] != "O")
+						System.out.println("Open cell cannot be flagged");
+					else
+					{
+						if (userTable[satir1 - 1][sutun1 - 1] == "F")
+							System.out.println("Cell is already flagged");
+						else
+						{
+							userTable[satir1 - 1][sutun1 - 1] = "F";
+						}
+					}
+				}
+				if (action.equals("U"))
+				{
+					if (userTable[satir1 - 1][sutun1 - 1] == "F")
+						userTable[satir1 - 1][sutun1 - 1] = "O";
+					else
+						System.out.println("Only flagged cells can be unflaged");
+				}
+			}
+			
+      // Here I check if the addition of number of unopened cells and flagged cells are equal to the number of mines on the board if thats the case player wins the game. 
+      
+      for (int i = 0;i < satir;i++)
+				{
+					for (int j = 0;j < sutun;j++)
+					{
+						if (userTable[i][j] == "O" || userTable[i][j] == "F")
+						end++;
+					}
+				}
+				if (end == numberOfMines)
+				{
+					
+					for (int i = 0;i < satir;i++)
+					{
+						for (int j = 0;j < sutun;j++)
+						{
+							if (j == sutun - 1)
+							System.out.print(userTable[i][j] + " \n");
+							else
+							System.out.print(userTable[i][j] + " ");
+						}
+					}
+					System.out.println("CONGRATULATIONS YOU WON!");
+					break;
+				}
+		}
+
+	}
+	/*This is a recursive method that I used for opening the neighbours of cells that doesn't have a mine neighbour It recalls itself if the neighbour of the cell also doesn't
+  have a neighbour mine cell.*/
+  
+  public static void method(int y , int x)
+	{
+		int[] arrayY = {0,1,0,-1,1,-1,1,-1};
+		int[] arrayX = {1,0,-1,0,1,-1,-1,1};
+		int count = 0;
+		userTable[y][x] = "-";
+		
+		for (int k = 0; k < arrayX.length;k++)
+		{
+			
+			int neighbourX = x - arrayX[k];
+			int neighbourY = y - arrayY[k];
+
+			if (neighbourX >= 0 && neighbourY >= 0 && neighbourY < table.length && neighbourX < table[0].length && userTable[neighbourY][neighbourX] != "-")
+			{
+				userTable[neighbourY][neighbourX] = table[neighbourY][neighbourX] + "";
+				if 	(table[neighbourY][neighbourX] == 0)
+				{
+					method(neighbourY,neighbourX);
+			
+
+				}
+			}
+
+		}
+			
+			
+	}	
+}
